@@ -114,7 +114,9 @@ android.libraryVariants.all { variant ->
             file(f.file.path + ".sha256sum").text = calcSha256(f.file)
         }
     }
-    task.finalizedBy zipMagiskMoudle
+    if (System.env.CI == null) {
+        task.finalizedBy zipMagiskMoudle
+    }
 }
 
 task zipMagiskMoudle(type: Zip) {
