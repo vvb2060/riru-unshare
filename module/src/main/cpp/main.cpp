@@ -8,6 +8,14 @@
 #include "nativehelper/scoped_utf_chars.h"
 #include "android_filesystem_config.h"
 
+static void doUnshare(JNIEnv *env, jint *uid, jint *mountExternal, jstring *niceName) {
+    if (*mountExternal == 0) {
+        *mountExternal = 1;
+        ScopedUtfChars name(env, *niceName);
+        LOGI("unshare uid=%d name=%s", *uid, name.c_str());
+    }
+}
+
 static void forkAndSpecializePre(
         JNIEnv *env, jclass clazz, jint *uid, jint *gid, jintArray *gids, jint *runtimeFlags,
         jobjectArray *rlimits, jint *mountExternal, jstring *seInfo, jstring *niceName,
@@ -16,11 +24,7 @@ static void forkAndSpecializePre(
         jobjectArray *pkgDataInfoList,
         jobjectArray *whitelistedDataInfoList, jboolean *bindMountAppDataDirs,
         jboolean *bindMountAppStorageDirs) {
-    if (*mountExternal == 0) {
-        *mountExternal = 1;
-        ScopedUtfChars name(env, *niceName);
-        LOGI("unshare uid=%d name=%s", *uid, name.c_str());
-    }
+    doUnshare(env, uid, mountExternal, niceName);
 }
 
 
@@ -30,11 +34,7 @@ static void specializeAppProcessPre(
         jboolean *startChildZygote, jstring *instructionSet, jstring *appDataDir,
         jboolean *isTopApp, jobjectArray *pkgDataInfoList, jobjectArray *whitelistedDataInfoList,
         jboolean *bindMountAppDataDirs, jboolean *bindMountAppStorageDirs) {
-    if (*mountExternal == 0) {
-        *mountExternal = 1;
-        ScopedUtfChars name(env, *niceName);
-        LOGI("unshare uid=%d name=%s", *uid, name.c_str());
-    }
+    doUnshare(env, uid, mountExternal, niceName);
 }
 
 
@@ -42,7 +42,7 @@ static int shouldSkipUid(int uid) {
     int appid = uid % AID_USER_OFFSET;
     if (appid >= AID_APP_START && appid <= AID_APP_END) return false;
     if (appid >= AID_ISOLATED_START && appid <= AID_ISOLATED_END) return false;
-    return false;
+    return true;
 }
 
 
@@ -98,4 +98,5 @@ void *init(void *arg) {
         }
     }
 }
+
 }
