@@ -1,2 +1,3 @@
-*.prop text eol=lf
-*.sh text eol=lf
+* text=auto eol=lf
+*.bat eol=crlf
+*.jar binary

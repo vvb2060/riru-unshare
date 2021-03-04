@@ -47,7 +47,6 @@ def riruDir = "$magiskDir/riru"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 
-import java.nio.file.Files
 import java.security.MessageDigest
 
 static def calcSha256(file) {
@@ -56,12 +55,6 @@ static def calcSha256(file) {
         md.update(bytes, 0, size)
     }
     return md.digest().encodeHex()
-}
-
-static def renameOrFail(File from, File to) {
-    if (!from.renameTo(to)) {
-        throw new IOException("Unable reanme file $from to $to")
-    }
 }
 
 android.libraryVariants.all { variant ->
@@ -100,12 +93,11 @@ android.libraryVariants.all { variant ->
         file("$riruDir/module.prop.new").text = riruModulePropText
 
         def nativeOutDir = file("build/intermediates/cmake/$variant.name/obj")
-        file("$magiskDir/system").mkdirs()
-        file("$magiskDir/system_x86").mkdirs()
-        renameOrFail(file("$nativeOutDir/arm64-v8a"), file("$magiskDir/system/lib64"))
-        renameOrFail(file("$nativeOutDir/armeabi-v7a"), file("$magiskDir/system/lib"))
-        renameOrFail(file("$nativeOutDir/x86_64"), file("$magiskDir/system_x86/lib64"))
-        renameOrFail(file("$nativeOutDir/x86"), file("$magiskDir/system_x86/lib"))
+        copy {
+            from "$nativeOutDir"
+            into "$magiskDir/lib"
+            exclude "**/*.txt"
+        }
 
         fileTree("$magiskDir").matching {
             exclude "README.md", "META-INF"
