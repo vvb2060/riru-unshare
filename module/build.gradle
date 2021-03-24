@@ -13,7 +13,9 @@ android {
                 arguments "-DMODULE_NAME:STRING=riru_$moduleId",
                         "-DRIRU_MODULE_API_VERSION=$moduleRiruApiVersion",
                         "-DRIRU_MODULE_VERSION=$moduleVersionCode",
-                        "-DRIRU_MODULE_VERSION_NAME:STRING=\"$moduleVersion\""
+                        "-DRIRU_MODULE_VERSION_NAME:STRING=\"$moduleVersion\"",
+                        "-DANDROID_STL=none"
+                cppFlags "-fno-exceptions -fno-rtti -s"
 
             }
         }
@@ -35,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'rikka.ndk:riru:10'
+    implementation 'dev.rikka.ndk:riru:25.0.0'
     implementation 'rikka.ndk.thirdparty:nativehelper:20201111'
 }
 

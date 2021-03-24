@@ -31,29 +31,29 @@ extract "$ZIPFILE" 'module.prop' "$MODPATH"
 extract "$ZIPFILE" 'post-fs-data.sh' "$MODPATH"
 extract "$ZIPFILE" 'uninstall.sh' "$MODPATH"
 
-mkdir "$MODPATH/system"
+mkdir "$MODPATH/riru"
 
 if [ "$ARCH" = "arm" ] || [ "$ARCH" = "arm64" ]; then
   ui_print "- Extracting arm libraries"
   extract "$ZIPFILE" "lib/armeabi-v7a/libriru_$RIRU_MODULE_ID.so" "$MODPATH"
-  mv "$MODPATH/lib/armeabi-v7a" "$MODPATH/system/lib"
+  mv "$MODPATH/lib/armeabi-v7a" "$MODPATH/riru/lib"
 
   if [ "$IS64BIT" = true ]; then
     ui_print "- Extracting arm64 libraries"
     extract "$ZIPFILE" "lib/arm64-v8a/libriru_$RIRU_MODULE_ID.so" "$MODPATH"
-    mv "$MODPATH/lib/arm64-v8a" "$MODPATH/system/lib64"
+    mv "$MODPATH/lib/arm64-v8a" "$MODPATH/riru/lib64"
   fi
 fi
 
 if [ "$ARCH" = "x86" ] || [ "$ARCH" = "x64" ]; then
   ui_print "- Extracting x86 libraries"
   extract "$ZIPFILE" "lib/x86/libriru_$RIRU_MODULE_ID.so" "$MODPATH"
-  mv "$MODPATH/lib/x86" "$MODPATH/system/lib"
+  mv "$MODPATH/lib/x86" "$MODPATH/riru/lib"
 
   if [ "$IS64BIT" = true ]; then
     ui_print "- Extracting x64 libraries"
     extract "$ZIPFILE" "lib/x86_64/libriru_$RIRU_MODULE_ID.so" "$MODPATH"
-    mv "$MODPATH/lib/x86_64" "$MODPATH/system/lib64"
+    mv "$MODPATH/lib/x86_64" "$MODPATH/riru/lib64"
   fi
 fi
 

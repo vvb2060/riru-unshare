@@ -3,12 +3,12 @@ ext {
     moduleName = "Enhanced mode for Magisk Hide"
     moduleAuthor = "vvb2060"
     moduleDescription = "Enable Enhanced mode for Magisk Hide. Allow Magisk Hide to handle isolated processes"
-    moduleVersion = "v1.0"
-    moduleVersionCode = 1
+    moduleVersion = "v1.1"
+    moduleVersionCode = 2
 
-    moduleMinRiruApiVersion = 9
-    moduleMinRiruVersionName = "v22.0"
-    moduleRiruApiVersion = 10
+    moduleMinRiruApiVersion = 25
+    moduleMinRiruVersionName = "25.0.0"
+    moduleRiruApiVersion = 25
 
     moduleProp = [
             name       : moduleName,
