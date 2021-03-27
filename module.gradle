@@ -1,30 +1,13 @@
 ext {
-    moduleId = "unshare"
+    moduleLibraryName = "unshare"
+    moduleMinRiruApiVersion = 25
+    moduleMinRiruVersionName = "v25.3.3"
+    moduleRiruApiVersion = 25
+    magiskModuleId = "riru_unshare"
+
     moduleName = "Enhanced mode for Magisk Hide"
     moduleAuthor = "vvb2060"
-    moduleDescription = "Enable Enhanced mode for Magisk Hide. Allow Magisk Hide to handle isolated processes"
-    moduleVersion = "v1.0"
-    moduleVersionCode = 1
-
-    moduleMinRiruApiVersion = 9
-    moduleMinRiruVersionName = "v22.0"
-    moduleRiruApiVersion = 10
-
-    moduleProp = [
-            name       : moduleName,
-            version    : moduleVersion,
-            versionCode: moduleVersionCode.toString(),
-            author     : moduleAuthor,
-            description: moduleDescription,
-            minApi     : moduleMinRiruApiVersion
-    ]
-
-    magiskModuleProp = [
-            id         : "riru-${moduleId.replace('_', '-')}",
-            name       : "Riru - ${moduleProp['name']}",
-            version    : moduleProp['version'],
-            versionCode: moduleProp['versionCode'],
-            author     : moduleProp['author'],
-            description: moduleProp['description']
-    ]
+    moduleDescription = "Enable Enhanced mode for Magisk Hide. Allow Magisk Hide to handle isolated processes."
+    moduleVersion = "v2.0"
+    moduleVersionCode = 2
 }

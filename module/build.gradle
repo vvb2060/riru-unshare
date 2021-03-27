@@ -10,11 +10,11 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         externalNativeBuild {
             cmake {
-                arguments "-DMODULE_NAME:STRING=riru_$moduleId",
+                arguments "-DMODULE_NAME:STRING=$moduleLibraryName",
                         "-DRIRU_MODULE_API_VERSION=$moduleRiruApiVersion",
                         "-DRIRU_MODULE_VERSION=$moduleVersionCode",
-                        "-DRIRU_MODULE_VERSION_NAME:STRING=\"$moduleVersion\""
-
+                        "-DRIRU_MODULE_VERSION_NAME:STRING=\"$moduleVersion\"",
+                        "-DRIRU_MODULE_MIN_API_VERSION=$moduleMinRiruApiVersion"
             }
         }
     }
@@ -30,20 +30,12 @@ android {
     }
 }
 
-repositories {
-    maven { url 'https://dl.bintray.com/rikkaw/Libraries' }
-}
-
 dependencies {
-    implementation 'rikka.ndk:riru:10'
-    implementation 'rikka.ndk.thirdparty:nativehelper:20201111'
+    implementation 'dev.rikka.ndk:riru:25.0.0'
+    implementation 'dev.rikka.ndk.thirdparty:nativehelper:1.0.1'
 }
 
-def outDir = file("$rootDir/out")
 def magiskDir = file("$outDir/magisk_module")
-def zipName = "${magiskModuleProp['id'].replace('_', '-')}-${magiskModuleProp['version']}.zip"
-def riruDir = "$magiskDir/riru"
-
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 
@@ -58,8 +50,23 @@ static def calcSha256(file) {
 }
 
 android.libraryVariants.all { variant ->
-    def task = variant.assembleProvider.get()
-    task.doLast {
+    def variantCapped = variant.name.capitalize()
+    def variantLowered = variant.name.toLowerCase()
+
+    def zipName = "${magiskModuleId.replace('_', '-')}-${moduleVersion}-${variantLowered}.zip"
+
+    def is_windows = org.gradle.internal.os.OperatingSystem.current().isWindows()
+
+    task("zip${variantCapped}", type: Zip) {
+        dependsOn("assemble${variantCapped}")
+        from magiskDir
+        archiveName zipName
+        destinationDir outDir
+    }
+
+    variant.outputs.all {
+        def task = variant.assembleProvider.get()
+
         delete { delete magiskDir }
 
         copy {
@@ -72,25 +79,33 @@ android.libraryVariants.all { variant ->
             into magiskDir.path
             include 'riru.sh'
             filter { line ->
-                line.replaceAll('%%%RIRU_MODULE_ID%%%', moduleId)
-                        .replaceAll('%%%RIRU_MODULE_API_VERSION%%%', moduleRiruApiVersion.toString())
+                def replaced = line.replaceAll('%%%RIRU_MODULE_API_VERSION%%%', moduleRiruApiVersion.toString())
                         .replaceAll('%%%RIRU_MODULE_MIN_API_VERSION%%%', moduleMinRiruApiVersion.toString())
                         .replaceAll('%%%RIRU_MODULE_MIN_RIRU_VERSION_NAME%%%', moduleMinRiruVersionName)
+                if (moduleMinRiruApiVersion >= 24) {
+                    replaced.replaceAll('%%%RIRU_MODULE_LIB_NAME%%%', moduleLibraryName)
+                } else {
+                    replaced.replaceAll('%%%RIRU_MODULE_LIB_NAME%%%', moduleLibraryName)
+                            .replaceAll('%%%RIRU_MODULE_ID_PRE24%%%', moduleLibraryName.substring("riru_".length()))
+                }
             }
-            filter(FixCrLfFilter.class, eol: FixCrLfFilter.CrLf.newInstance("lf"))
+            filter(FixCrLfFilter.class,
+                    eol: FixCrLfFilter.CrLf.newInstance("lf"))
         }
 
+        def moduleProp = [
+                id         : magiskModuleId,
+                name       : moduleName,
+                version    : moduleVersion,
+                versionCode: moduleVersionCode.toString(),
+                author     : moduleAuthor,
+                description: moduleDescription,
+        ]
+
         def modulePropText = ""
-        magiskModuleProp.each { k, v -> modulePropText += "$k=$v\n" }
+        moduleProp.each { k, v -> modulePropText += "$k=$v\n" }
         modulePropText = modulePropText.trim()
         file("$magiskDir/module.prop").text = modulePropText
-
-        def riruModulePropText = ""
-        moduleProp.each { k, v -> riruModulePropText += "$k=$v\n" }
-        riruModulePropText = riruModulePropText.trim()
-        file(riruDir).mkdirs()
-
-        file("$riruDir/module.prop.new").text = riruModulePropText
 
         def nativeOutDir = file("build/intermediates/cmake/$variant.name/obj")
         copy {
@@ -105,14 +120,41 @@ android.libraryVariants.all { variant ->
             if (f.directory) return
             file(f.file.path + ".sha256sum").text = calcSha256(f.file)
         }
-    }
-    if (System.env.CI == null) {
-        task.finalizedBy zipMagiskMoudle
-    }
-}
 
-task zipMagiskMoudle(type: Zip) {
-    from magiskDir
-    archiveName zipName
-    destinationDir outDir
+        task.finalizedBy("zip${variantCapped}")
+    }
+
+    task("push${variantCapped}", type: Exec) {
+        dependsOn("assemble${variantCapped}")
+        workingDir outDir
+        def commands = [android.adbExecutable, "push",
+                        zipName,
+                        "/data/local/tmp/"]
+        if (is_windows) {
+            commandLine 'cmd', '/c', commands.join(" ")
+        } else {
+            commandLine commands
+        }
+    }
+
+    task("flash${variantCapped}", type: Exec) {
+        dependsOn("push${variantCapped}")
+        def commands = [android.adbExecutable, "shell", "su", "-c",
+                        "magisk --install-module /data/local/tmp/${zipName}"]
+        if (is_windows) {
+            commandLine 'cmd', '/c', commands.join(" ")
+        } else {
+            commandLine commands
+        }
+    }
+
+    task("flashAndReoot${variantCapped}", type: Exec) {
+        dependsOn("flash${variantCapped}")
+        def commands = [android.adbExecutable, "shell", "reboot"]
+        if (is_windows) {
+            commandLine 'cmd', '/c', commands.join(" ")
+        } else {
+            commandLine commands
+        }
+    }
 }
