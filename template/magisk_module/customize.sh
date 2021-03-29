@@ -20,8 +20,8 @@ fi
 # RIRU_VERSION_CODE: version code of installed Riru, 0 if not installed or version < v23.2
 # RIRU_VERSION_NAME: version name of installed Riru, "" if not installed or version < v23.2
 
-extract "$ZIPFILE" 'riru.sh' "$MODPATH"
-. $MODPATH/riru.sh
+extract "$ZIPFILE" 'riru.sh' "$TMPDIR"
+. $TMPDIR/riru.sh
 
 # Functions from riru.sh
 check_riru_version

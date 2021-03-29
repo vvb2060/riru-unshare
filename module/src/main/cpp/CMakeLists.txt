@@ -25,7 +25,7 @@ set(C_FLAGS "-Werror=format -fdata-sections -ffunction-sections")
 set(CMAKE_ANDROID_STL_TYPE "none")
 set(CXX_FLAGS "${CXX_FLAGS} -fno-exceptions -fno-rtti")
 
-if (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(C_FLAGS "${C_FLAGS} -Os -fvisibility=hidden -fvisibility-inlines-hidden")
     set(LINKER_FLAGS "${LINKER_FLAGS} -Wl,-exclude-libs,ALL -Wl,--gc-sections -Wl,--strip-all")
 else ()
