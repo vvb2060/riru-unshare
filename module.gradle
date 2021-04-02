@@ -3,9 +3,9 @@ ext {
     moduleMinRiruApiVersion = 25
     moduleMinRiruVersionName = "v25.3.3"
     moduleRiruApiVersion = 25
-    magiskModuleId = "riru_unshare"
+    magiskModuleId = "riru-unshare"
 
-    moduleName = "Enhanced mode for Magisk Hide"
+    moduleName = "Riru - Enhanced mode for Magisk Hide"
     moduleAuthor = "vvb2060"
     moduleDescription = "Enable Enhanced mode for Magisk Hide. Allow Magisk Hide to handle isolated processes."
     moduleVersion = "v2.0"
