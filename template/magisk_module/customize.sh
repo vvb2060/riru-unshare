@@ -38,8 +38,8 @@ fi
 ui_print "- Extracting module files"
 
 extract "$ZIPFILE" 'module.prop' "$MODPATH"
-extract "$ZIPFILE" 'post-fs-data.sh' "$MODPATH"
-extract "$ZIPFILE" 'uninstall.sh' "$MODPATH"
+# extract "$ZIPFILE" 'post-fs-data.sh' "$MODPATH"
+# extract "$ZIPFILE" 'uninstall.sh' "$MODPATH"
 
 # Riru v24+ load files from the "riru" folder in the Magisk module folder
 # This "riru" folder is also used to determine if a Magisk module is a Riru module
