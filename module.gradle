@@ -1,7 +1,7 @@
 ext {
     moduleLibraryName = "unshare"
     moduleMinRiruApiVersion = 25
-    moduleMinRiruVersionName = "v25.3.3"
+    moduleMinRiruVersionName = "v25.4.2"
     moduleRiruApiVersion = 25
     magiskModuleId = "riru-unshare"
 

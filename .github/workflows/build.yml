@@ -29,11 +29,13 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-${{ github.sha }}
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
-        run: ./gradlew aR
+        run: |
+          ./gradlew aR --build-cache
+          ./gradlew --stop
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
