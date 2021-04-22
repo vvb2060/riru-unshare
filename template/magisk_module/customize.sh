@@ -11,6 +11,9 @@ if [ ! -f "$TMPDIR/verify.sh" ]; then
 fi
 . $TMPDIR/verify.sh
 
+extract "$ZIPFILE" 'customize.sh' "$TMPDIR/.vunzip"
+extract "$ZIPFILE" 'verify.sh' "$TMPDIR/.vunzip"
+
 # Extract riru.sh
 
 # Variables provided by riru.sh:

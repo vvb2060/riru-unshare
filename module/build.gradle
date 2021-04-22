@@ -111,10 +111,7 @@ afterEvaluate {
                     exclude "**/*.txt"
                 }
 
-                // generate sha1sum
-                fileTree("$magiskDir").matching {
-                    exclude "README.md", "META-INF"
-                }.visit { f ->
+                fileTree("$magiskDir").visit { f ->
                     if (f.directory) return
                     file(f.file.path + ".sha256sum").text = calcSha256(f.file)
                 }
